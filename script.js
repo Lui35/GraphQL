@@ -1,6 +1,7 @@
 import { getLastSlug } from "./helpers.js";
 const baseUrl = "https://learn.reboot01.com";
 export function login(username, password) {
+    alert("login");
     const base64Data = btoa(`${username}:${password}`);
     const requestOptions = {
         method: "POST",
