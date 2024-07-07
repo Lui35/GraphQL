@@ -26,7 +26,7 @@ function checkJWT() {
         fetch(`${baseUrl}/api/auth/validate`, requestOptions) // Adjust the endpoint to validate JWT
             .then(response => {
                 if (response.status === 200) {
-                    window.location.href = 'another_page.html'; // Redirect to another page
+                    window.location.href = 'profilePage.html'; // Redirect to another page
                 } else {
                     localStorage.removeItem("hasura-jwt"); // Remove invalid JWT
                 }
