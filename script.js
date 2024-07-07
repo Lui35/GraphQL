@@ -1,6 +1,19 @@
-import { getLastSlug } from "./helpers.js";
+//import { getLastSlug } from "./helpers.js";
 const baseUrl = "https://learn.reboot01.com";
-export function login(username, password) {
+
+window.handleLogin = function() {
+    var username = document.getElementById('username').value;
+    var password = document.getElementById('password').value;
+    login(username, password)
+        .then(() => alert('Login successful'))
+        .catch(err => alert(`Login failed: ${err}`));
+}
+
+
+export function login() {
+    var username = document.getElementById('username').value;
+    var password = document.getElementById('password').value;
+
     alert("login");
     const base64Data = btoa(`${username}:${password}`);
     const requestOptions = {

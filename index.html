@@ -1,10 +1,13 @@
-
-<html>
+<!DOCTYPE html>
+<html lang="en">
 
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login Page</title>
   <link rel="stylesheet" type="text/css" href="style.css">
   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script type="text/javascript" src="script.js"></script>
+  <script type="module" src="script.js"></script>
 </head>
 
 <body>
@@ -13,7 +16,7 @@
     <div class="form">
       <input type="text" id="username" placeholder="username" />
       <input type="password" id="password" placeholder="password" />
-      <button id="login" type="button" onclick="login()">Login</button></br>
+      <button id="login" type="button" onclick="handleLogin()">Login</button><br>
     </div>
   </div>
 
