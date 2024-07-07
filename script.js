@@ -1,46 +1,76 @@
-//import { getLastSlug } from "./helpers.js";
+
+document.addEventListener('DOMContentLoaded', checkJWT);
 const baseUrl = "https://learn.reboot01.com";
 
+// Function to handle login button click
 window.handleLogin = function() {
-    var username = document.getElementById('username').value;
-    var password = document.getElementById('password').value;
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
     login(username, password)
-        .then(() => alert('Login successful'))
+        .then(() => {
+            alert('Login successful');
+            window.location.href = 'profilePage.html'; // Redirect to another page
+        })
         .catch(err => alert(`Login failed: ${err}`));
 }
 
+function checkJWT() {
+    const jwt = localStorage.getItem("hasura-jwt");
+    if (jwt) {
+        const requestOptions = {
+            method: "GET",
+            headers: {
+                Authorization: `Bearer ${jwt}`,
+            },
+        };
+        fetch(`${baseUrl}/api/auth/validate`, requestOptions) // Adjust the endpoint to validate JWT
+            .then(response => {
+                if (response.status === 200) {
+                    window.location.href = 'another_page.html'; // Redirect to another page
+                } else {
+                    localStorage.removeItem("hasura-jwt"); // Remove invalid JWT
+                }
+            })
+            .catch(() => localStorage.removeItem("hasura-jwt")); // Remove JWT if request fails
+    }
+}
 
-export function login() {
-    var username = document.getElementById('username').value;
-    var password = document.getElementById('password').value;
-
-    alert("login");
+export function login(username, password) {
+    // Encode username and password in Base64
     const base64Data = btoa(`${username}:${password}`);
+    // Set up request options
     const requestOptions = {
         method: "POST",
         headers: {
             Authorization: `Basic ${base64Data}`,
         },
     };
+    
+    // Return a promise for the fetch request
     return new Promise((resolve, reject) => {
+        // Fetch request to login API
         fetch(`${baseUrl}/api/auth/signin`, requestOptions)
             .then(async (response) => {
+                // Check if login is successful
                 if (response.status === 200) {
                     return response.text();
-                }
-                else {
+                } else {
+                    // Handle login errors
                     const error = await response.json();
-                    reject(error.error ||
-                        `could not login: ${response.status} ${response.statusText}`);
+                    reject(
+                        error.error ||
+                        `could not login: ${response.status} ${response.statusText}`
+                    );
                     return;
                 }
             })
             .then((jwt) => {
+                // Check if JWT is valid
                 if (!jwt || jwt.trim() == "") {
                     reject(`invalid jwt received: ${jwt}`);
                     return;
                 }
-                // JWT arrived surronded by quotes, so we remove them
+                // Remove quotes from JWT and store in localStorage
                 localStorage.setItem("hasura-jwt", jwt.replaceAll('"', ""));
                 resolve();
             });
@@ -60,6 +90,58 @@ export async function logout() {
     await fetch(`${baseUrl}/api/auth/signout`, data);
     localStorage.removeItem("hasura-jwt");
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 export async function getTitleData(userId) {
