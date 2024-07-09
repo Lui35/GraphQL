@@ -23,6 +23,7 @@ window.handleLogin = function () {
 
 function checkJWT() {
   const jwt = localStorage.getItem("hasura-jwt");
+  
   if (jwt) {
     window.location.href = "profilePage.html";
   }
@@ -107,46 +108,6 @@ export async function getTitleData(userId) {
           firstName: data.data.user[0].firstName,
           level: data.data.event_user[0].level,
         });
-      });
-  });
-}
-
-// just to make auditors happy
-export async function getUserId() {
-  const query = `
-        query {
-            user {
-                id
-            }
-        }
-    `;
-  return new Promise((resolve, reject) => {
-    fetch(`${baseUrl}/api/graphql-engine/v1/graphql`, {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${localStorage.getItem("hasura-jwt")}`,
-      },
-      body: JSON.stringify({ query }),
-    })
-      .then((response) => {
-        if (response.status !== 200) {
-          reject(
-            `could not get user id: ${response.status} ${response.statusText}`
-          );
-          return;
-        }
-        return response.json();
-      })
-      .then((data) => {
-        if (data.errors) {
-          reject(`could not get user id: ${data.errors[0].message}`);
-          return;
-        }
-        if (data.data.user.length === 0) {
-          reject(`user not found`);
-          return;
-        }
-        resolve(data.data.user[0].id);
       });
   });
 }
@@ -344,6 +305,8 @@ export async function getXpForProjects(userId) {
       });
   });
 }
+
+
 const GET_SKILLS = `
 query test($userId: Int) {
   user(where: {id: {_eq: $userId}}) {
@@ -407,6 +370,8 @@ export async function getSkills(userId) {
   transactions.sort((a, b) => b.amount - a.amount);
   return transactions;
 }
+
+
 export async function getAuditsWithEvents(userId) {
   // Fetch audits
   const auditResponse = await fetch(
