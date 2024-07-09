@@ -2,8 +2,8 @@ document.addEventListener("DOMContentLoaded", checkJWT);
 const baseUrl = "https://learn.reboot01.com";
 
 function delay(milliseconds) {
-    return new Promise(resolve => setTimeout(resolve, milliseconds));
-  }
+  return new Promise((resolve) => setTimeout(resolve, milliseconds));
+}
 
 // Function to handle login button click
 window.handleLogin = function () {
@@ -18,12 +18,15 @@ window.handleLogin = function () {
     .then(() => {
       window.location.href = "profilePage.html"; // Redirect to another page
     })
-    .catch((err) => alert(`Login failed: ${err}`));
+    .catch((err) => {
+      $('#loginAlert').removeAttr('hidden');
+      $('#loginAlert').html(err.message);
+    });
 };
 
 function checkJWT() {
   const jwt = localStorage.getItem("hasura-jwt");
-  
+
   if (jwt) {
     window.location.href = "profilePage.html";
   }
@@ -63,8 +66,6 @@ export function login(username, password) {
       localStorage.setItem("hasura-jwt", jwt.replaceAll('"', ""));
     });
 }
-
-
 
 export async function getTitleData(userId) {
   const query = `
@@ -306,7 +307,6 @@ export async function getXpForProjects(userId) {
   });
 }
 
-
 const GET_SKILLS = `
 query test($userId: Int) {
   user(where: {id: {_eq: $userId}}) {
@@ -370,7 +370,6 @@ export async function getSkills(userId) {
   transactions.sort((a, b) => b.amount - a.amount);
   return transactions;
 }
-
 
 export async function getAuditsWithEvents(userId) {
   // Fetch audits

@@ -1,43 +1,65 @@
 .login-page {
-    width: 360px;
-    padding: 8% 0 0;
-    margin: auto;
-  }
-  .form {
-    position: relative;
-    background: #ffffff;
-    max-width: 360px;
-    margin: 0 auto 100px;
-    padding: 45px;
-    text-align: center;
-  }
-  .form input {
-    font-family: "Roboto", sans-serif;
-    outline: 0;
-    background: #f2f2f2;
-    width: 100%;
-    border: 0;
-    margin: 0 0 15px;
-    padding: 15px;
-    box-sizing: border-box;
-    font-size: 14px;
-  }
-  .form button {
-    font-family: "Roboto", sans-serif;
-    outline: 0;
-    background: #808080;
-    width: 100%;
-    border: 0;
-    padding: 15px;
-    color: #ffffff;
-    font-size: 14px;
-  }
-  
-  .form button:hover{
-    background: rgb(54, 54, 54);
-  }
+  width: 360px;
+  padding: 8% 0 0;
+  margin: auto;
+}
+.form {
+  position: relative;
+  background: #ffffff;
+  max-width: 360px;
+  margin: 0 auto 100px;
+  padding: 45px;
+  text-align: center;
+}
+.form input {
+  font-family: "Roboto", sans-serif;
+  outline: 0;
+  background: #f2f2f2;
+  width: 100%;
+  border: 0;
+  margin: 0 0 15px;
+  padding: 15px;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.form button {
+  font-family: "Roboto", sans-serif;
+  outline: 0;
+  background: #808080;
+  width: 100%;
+  border: 0;
+  padding: 15px;
+  color: #ffffff;
+  font-size: 14px;
+}
 
-  body {
-    background: #808080;
-  }
-  
+.form button:hover {
+  background: rgb(54, 54, 54);
+}
+
+body {
+  background: #808080;
+}
+
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.text-container {
+  display: inline-block;
+}
+.text-container h1,
+.text-container p {
+  display: inline;
+  margin: 0;
+  vertical-align: baseline;
+}
+
+
+.text-container p {
+  font-size: .9em; /* Adjust the font size to your liking */
+/* Adjust space between the h1 and p */
+  font-style: italic;
+  font-family: 'Roboto Condensed', sans-serif;
+}

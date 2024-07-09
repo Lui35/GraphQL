@@ -5,6 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login Page</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
     <script
       type="text/javascript"
       src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"
@@ -13,9 +19,25 @@
     <script type="module" src="profilePage.js"></script>
     <script type="module" src="query.js"></script>
     <title>Document</title>
+
   </head>
-  <head> </head>
+
   <body>
-    <button id="logoutButton">Logout</button>
+    <header class="container-fluid bg-dark text-white py-3">
+      <div class="header-container">
+        <div class="text-container">
+          <h1 id="UserWel">Welcome,</h1>
+          <p id = "Userlvl"></p>
+        </div>
+        <div>
+          <button id="myProfileBtn" type="button" class="btn btn-secondary ">
+            My Profile
+          </button>
+          <button id="logoutButton" type="button" class="btn btn-danger ">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
   </body>
 </html>
