@@ -7,12 +7,13 @@ const baseUrl = "https://learn.reboot01.com";
 
 function checkJWT() {
   const jwt = localStorage.getItem("hasura-jwt");
-  CheckJwtWithParse();
-  LoginWithJwt();
-  displayData();
   if (!jwt) {
     window.location.href = "index.html";
+  }else{
+    LoginWithJwt();
+    CheckJwtWithParse();
   }
+  displayData();
 }
 
 async function logout() {
@@ -38,24 +39,6 @@ async function LoginWithJwt() {
   }
 }
 
-export function parseJwts() {
-  const token = localStorage.getItem("hasura-jwt") || "";
-  if (!token) {
-    console.log("No token found");
-    return;
-  }
-  try {
-    const base64Url = token.split(".")[1];
-    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    const jsonPayload = decodeURIComponent(atob(base64).split("").map(function(c) {
-        return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(""));
-    
-    console.log(JSON.stringify(JSON.parse(jsonPayload), null, 2)); // This will print the JSON payload properly formatted
-  } catch (e) {
-    console.error("Error parsing JWT", e);
-  }
-}
 
 function CheckJwtWithParse() {
   const userData = parseJwt();
