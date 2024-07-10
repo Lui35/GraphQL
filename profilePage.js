@@ -124,9 +124,13 @@ async function displayData() {
     const latestFinishedAudit = await getLatestFinishedAudit(userId);
     const latestFinishedProject = await getLatestFinishedProject(userId);
 
-    $("#latestAudit").text("Latest Audit: " + latestFinishedAudit.captain + " " + latestFinishedAudit.projectName);
+    $("#latestAudit").text(
+      "Latest Audit: " +
+        latestFinishedAudit.captain +
+        " " +
+        latestFinishedAudit.projectName
+    );
     $("#latestProject").text("Latest Project: " + latestFinishedProject);
-
 
     const auditData = await getAuditData(userId);
     createBarChart(auditData);
@@ -146,20 +150,18 @@ async function displaytitleData() {
 }
 
 async function displayXpData(userId) {
-    const xpData = await getXpForProjects(userId);
-    // Sort xpData by amount in descending order
-    const sortedXpData = xpData.sort((a, b) => b.amount - a.amount).slice(0, 8);//you can specidy how much of it you need 
-    // Create a formatted string for each project
-    const xpDetails = sortedXpData
-      .map((xp) => `${xp.name}: ${xp.amount} XP`)
-      .join("\n");
-    // Display total XP and detailed XP in the UI
-    $("#xpDetails").text(xpDetails);
+  const xpData = await getXpForProjects(userId);
+  // Sort xpData by amount in descending order
+  const sortedXpData = xpData.sort((a, b) => b.amount - a.amount).slice(0, 8); //you can specidy how much of it you need
+  // Create a formatted string for each project
+  const xpDetails = sortedXpData
+    .map((xp) => `${xp.name}: ${xp.amount} XP`)
+    .join("\n");
+  // Display total XP and detailed XP in the UI
+  $("#xpDetails").text(xpDetails);
 
   createPieChart(sortedXpData);
 }
-
-
 
 function createBarChart(data) {
   const { auditRatio, totalDown, totalUp } = data;
@@ -222,15 +224,13 @@ function createBarChart(data) {
   svg.selectAll(".domain, .tick line").style("stroke", "#black");
 }
 
-
-
 function createPieChart(data) {
   const width = 960,
     height = 450,
     radius = Math.min(width, height) / 2;
 
   const svg = d3
-    .select("#xpChart")
+    .select("body")
     .append("svg")
     .attr("width", width)
     .attr("height", height)
@@ -239,7 +239,6 @@ function createPieChart(data) {
 
   svg.append("g").attr("class", "slices");
   svg.append("g").attr("class", "labels");
-  svg.append("g").attr("class", "lines");
 
   const pie = d3
     .pie()
@@ -260,6 +259,8 @@ function createPieChart(data) {
     .scaleOrdinal(d3.schemeCategory10)
     .domain(data.map((d) => d.name));
 
+  const tooltip = d3.select("body").append("div").attr("class", "tooltip");
+
   function change(data) {
     const pieData = pie(data);
 
@@ -273,6 +274,16 @@ function createPieChart(data) {
       .append("path")
       .attr("class", "slice")
       .style("fill", (d) => color(d.data.name))
+      .on("mouseover", function (event, d) {
+        tooltip.transition().duration(200).style("opacity", 0.9);
+        tooltip
+          .html(`${d.data.name}: ${d.data.amount} XP`)
+          .style("left", event.pageX + 5 + "px")
+          .style("top", event.pageY - 28 + "px");
+      })
+      .on("mouseout", function () {
+        tooltip.transition().duration(500).style("opacity", 0);
+      })
       .merge(slice)
       .transition()
       .duration(1000)
@@ -294,7 +305,6 @@ function createPieChart(data) {
       .enter()
       .append("text")
       .attr("dy", ".35em")
-      .text((d) => d.data.name)
       .merge(text)
       .transition()
       .duration(1000)
@@ -320,31 +330,6 @@ function createPieChart(data) {
       });
 
     text.exit().remove();
-
-    const polyline = svg
-      .select(".lines")
-      .selectAll("polyline")
-      .data(pieData, (d) => d.data.name);
-
-    polyline
-      .enter()
-      .append("polyline")
-      .merge(polyline)
-      .transition()
-      .duration(1000)
-      .attrTween("points", function (d) {
-        this._current = this._current || d;
-        const interpolate = d3.interpolate(this._current, d);
-        this._current = interpolate(0);
-        return (t) => {
-          const d2 = interpolate(t);
-          const pos = outerArc.centroid(d2);
-          pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
-          return [arc.centroid(d2), outerArc.centroid(d2), pos];
-        };
-      });
-
-    polyline.exit().remove();
   }
 
   function midAngle(d) {
