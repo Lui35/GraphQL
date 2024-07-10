@@ -119,15 +119,47 @@ export async function getUserId() {
 
 async function displayData() {
   try {
-    var userData = await getTitleData(userId);
-    $("#UserWel").text("Welcome, " + userData.firstName);
-    $("#Userlvl").text("lvl" + userData.level);
+    await displaytitleData();
+    await displayXpData(userId);
+    const latestFinishedAudit = await getLatestFinishedAudit(userId);
+    const latestFinishedProject = await getLatestFinishedProject(userId);
+
+    $("#latestAudit").text("Latest Audit: " + latestFinishedAudit.captain + " " + latestFinishedAudit.projectName);
+    $("#latestProject").text("Latest Project: " + latestFinishedProject);
+
+
     const auditData = await getAuditData(userId);
     createBarChart(auditData);
   } catch (error) {
     alert(error.message);
   }
 }
+
+async function displaytitleData() {
+  try {
+    var userData = await getTitleData(userId);
+    $("#UserWel").text("Welcome, " + userData.firstName);
+    $("#Userlvl").text("lvl" + userData.level);
+  } catch (error) {
+    alert(error.message);
+  }
+}
+
+async function displayXpData(userId) {
+    const xpData = await getXpForProjects(userId);
+    // Sort xpData by amount in descending order
+    const sortedXpData = xpData.sort((a, b) => b.amount - a.amount).slice(0, 8);//you can specidy how much of it you need 
+    // Create a formatted string for each project
+    const xpDetails = sortedXpData
+      .map((xp) => `${xp.name}: ${xp.amount} XP`)
+      .join("\n");
+    // Display total XP and detailed XP in the UI
+    $("#xpDetails").text(xpDetails);
+
+  createPieChart(sortedXpData);
+}
+
+
 
 function createBarChart(data) {
   const { auditRatio, totalDown, totalUp } = data;
@@ -136,7 +168,7 @@ function createBarChart(data) {
     { label: "Received", value: totalDown },
     { label: "Done", value: totalUp },
   ];
-$("#auditRatio").text("Audit ratio : "+parseFloat(auditRatio.toFixed(2)));
+  $("#auditRatio").text("Audit ratio : " + parseFloat(auditRatio.toFixed(2)));
   const width = 600;
   const height = 100;
   const margin = { top: 20, right: 30, bottom: 20, left: 100 };
@@ -147,9 +179,9 @@ $("#auditRatio").text("Audit ratio : "+parseFloat(auditRatio.toFixed(2)));
     .append("svg")
     .attr("width", width)
     .attr("height", height)
-    .style("background-color", "white") // Match the background color from the example
-    //.style("display", "block")
-    //.style("margin", "auto");
+    .style("background-color", "white"); // Match the background color from the example
+  //.style("display", "block")
+  //.style("margin", "auto");
 
   // Set the scales
   const y = d3
@@ -188,4 +220,138 @@ $("#auditRatio").text("Audit ratio : "+parseFloat(auditRatio.toFixed(2)));
     .style("font-weight", "bold");
   // Style the axis lines and ticks
   svg.selectAll(".domain, .tick line").style("stroke", "#black");
+}
+
+
+
+function createPieChart(data) {
+  const width = 960,
+    height = 450,
+    radius = Math.min(width, height) / 2;
+
+  const svg = d3
+    .select("#xpChart")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", `translate(${width / 2}, ${height / 2})`);
+
+  svg.append("g").attr("class", "slices");
+  svg.append("g").attr("class", "labels");
+  svg.append("g").attr("class", "lines");
+
+  const pie = d3
+    .pie()
+    .sort(null)
+    .value((d) => d.amount);
+
+  const arc = d3
+    .arc()
+    .outerRadius(radius * 0.8)
+    .innerRadius(radius * 0.4);
+
+  const outerArc = d3
+    .arc()
+    .innerRadius(radius * 0.9)
+    .outerRadius(radius * 0.9);
+
+  const color = d3
+    .scaleOrdinal(d3.schemeCategory10)
+    .domain(data.map((d) => d.name));
+
+  function change(data) {
+    const pieData = pie(data);
+
+    const slice = svg
+      .select(".slices")
+      .selectAll("path.slice")
+      .data(pieData, (d) => d.data.name);
+
+    slice
+      .enter()
+      .append("path")
+      .attr("class", "slice")
+      .style("fill", (d) => color(d.data.name))
+      .merge(slice)
+      .transition()
+      .duration(1000)
+      .attrTween("d", function (d) {
+        this._current = this._current || d;
+        const interpolate = d3.interpolate(this._current, d);
+        this._current = interpolate(0);
+        return (t) => arc(interpolate(t));
+      });
+
+    slice.exit().remove();
+
+    const text = svg
+      .select(".labels")
+      .selectAll("text")
+      .data(pieData, (d) => d.data.name);
+
+    text
+      .enter()
+      .append("text")
+      .attr("dy", ".35em")
+      .text((d) => d.data.name)
+      .merge(text)
+      .transition()
+      .duration(1000)
+      .attrTween("transform", function (d) {
+        this._current = this._current || d;
+        const interpolate = d3.interpolate(this._current, d);
+        this._current = interpolate(0);
+        return (t) => {
+          const d2 = interpolate(t);
+          const pos = outerArc.centroid(d2);
+          pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+          return `translate(${pos})`;
+        };
+      })
+      .styleTween("text-anchor", function (d) {
+        this._current = this._current || d;
+        const interpolate = d3.interpolate(this._current, d);
+        this._current = interpolate(0);
+        return (t) => {
+          const d2 = interpolate(t);
+          return midAngle(d2) < Math.PI ? "start" : "end";
+        };
+      });
+
+    text.exit().remove();
+
+    const polyline = svg
+      .select(".lines")
+      .selectAll("polyline")
+      .data(pieData, (d) => d.data.name);
+
+    polyline
+      .enter()
+      .append("polyline")
+      .merge(polyline)
+      .transition()
+      .duration(1000)
+      .attrTween("points", function (d) {
+        this._current = this._current || d;
+        const interpolate = d3.interpolate(this._current, d);
+        this._current = interpolate(0);
+        return (t) => {
+          const d2 = interpolate(t);
+          const pos = outerArc.centroid(d2);
+          pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+          return [arc.centroid(d2), outerArc.centroid(d2), pos];
+        };
+      });
+
+    polyline.exit().remove();
+  }
+
+  function midAngle(d) {
+    return d.startAngle + (d.endAngle - d.startAngle) / 2;
+  }
+
+  change(data);
+
+  d3.select(".randomize").on("click", () => change(data));
 }
