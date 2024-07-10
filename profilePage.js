@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", checkJWT);
 // Existing functions in profilePage.js
 document.getElementById("logoutButton").addEventListener("click", logout);
-$('#myProfileBtn').on('click', function() {
+$("#myProfileBtn").on("click", function () {
   location.reload();
 });
 
@@ -120,10 +120,10 @@ export async function getUserId() {
 async function displayData() {
   try {
     var userData = await getTitleData(userId);
-    $("#UserWel").text( "Welcome, "+ userData.firstName);
-    $("#Userlvl").text("lvl"+userData.level);
+    $("#UserWel").text("Welcome, " + userData.firstName);
+    $("#Userlvl").text("lvl" + userData.level);
     const auditData = await getAuditData(userId);
-    //createBarChart(auditData);
+    createBarChart(auditData);
   } catch (error) {
     alert(error.message);
   }
@@ -131,40 +131,38 @@ async function displayData() {
 
 function createBarChart(data) {
   const { auditRatio, totalDown, totalUp } = data;
-
   // Prepare the data
   const chartData = [
-    { label: "Audit Ratio", value: auditRatio },
-    { label: "Total Down", value: totalDown },
-    { label: "Total Up", value: totalUp },
+    { label: "Received", value: totalDown },
+    { label: "Done", value: totalUp },
   ];
-
+$("#auditRatio").text("Audit ratio : "+parseFloat(auditRatio.toFixed(2)));
   const width = 600;
-  const height = 400;
-  const margin = { top: 20, right: 30, bottom: 40, left: 40 };
+  const height = 100;
+  const margin = { top: 20, right: 30, bottom: 20, left: 100 };
 
   // Create SVG container
   const svg = d3
-    .select("body")
+    .select("#AuditChart")
     .append("svg")
     .attr("width", width)
     .attr("height", height)
-    .style("background-color", "#ccc")
-    .style("display", "block")
-    .style("margin", "auto");
+    .style("background-color", "white") // Match the background color from the example
+    //.style("display", "block")
+    //.style("margin", "auto");
 
   // Set the scales
-  const x = d3
+  const y = d3
     .scaleBand()
     .domain(chartData.map((d) => d.label))
-    .range([margin.left, width - margin.right])
-    .padding(0.1);
+    .range([margin.top, height - margin.bottom])
+    .padding(0.3); // Adjust padding to match the style
 
-  const y = d3
+  const x = d3
     .scaleLinear()
     .domain([0, d3.max(chartData, (d) => d.value)])
     .nice()
-    .range([height - margin.bottom, margin.top]);
+    .range([margin.left, width - margin.right]);
 
   // Add the bars
   svg
@@ -173,27 +171,21 @@ function createBarChart(data) {
     .enter()
     .append("rect")
     .attr("class", "bar")
-    .attr("x", (d) => x(d.label))
-    .attr("y", (d) => y(d.value))
-    .attr("width", x.bandwidth())
-    .attr("height", (d) => y(0) - y(d.value))
-    .attr("fill", (d) =>
-      d.label === "Audit Ratio"
-        ? "blue"
-        : d.label === "Total Down"
-        ? "red"
-        : "green"
-    );
-
-  // Add the x-axis
-  svg
-    .append("g")
-    .attr("transform", `translate(0,${height - margin.bottom})`)
-    .call(d3.axisBottom(x));
+    .attr("x", margin.left)
+    .attr("y", (d) => y(d.label))
+    .attr("width", (d) => x(d.value) - margin.left)
+    .attr("height", y.bandwidth())
+    .attr("fill", "#black"); // Match the bar color from the example
 
   // Add the y-axis
   svg
     .append("g")
     .attr("transform", `translate(${margin.left},0)`)
-    .call(d3.axisLeft(y));
+    .call(d3.axisLeft(y).tickSize(0)) // Remove tick marks
+    .selectAll("text")
+    .style("fill", "#black") // Match the label color from the example
+    .style("font-size", "16px")
+    .style("font-weight", "bold");
+  // Style the axis lines and ticks
+  svg.selectAll(".domain, .tick line").style("stroke", "#black");
 }
