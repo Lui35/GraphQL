@@ -70,7 +70,7 @@ body {
 }
 
 svg {
-  width: 100%;
+  width: 450;
   height: 100%;
 }
 
@@ -95,3 +95,29 @@ polyline {
   pointer-events: none;
   opacity: 0;
 }
+
+#xpChart{
+  width: 450px;
+  height: 450px;
+}
+
+#AuditChart{
+  width: 450px;
+  height: 100px;
+}
+
+.flexcontainer {
+  display: flex;
+  flex-direction: row; /* row (default) or column */
+}
+
+.details{
+  font-weight: bold;
+}
+
+.container {
+  display: flex;
+  justify-content: center; /* Aligns items horizontally */
+  align-items: center; /* Aligns items vertically */
+}
+

@@ -125,12 +125,11 @@ async function displayData() {
     const latestFinishedProject = await getLatestFinishedProject(userId);
 
     $("#latestAudit").text(
-      "Latest Audit: " +
-        latestFinishedAudit.captain +
-        " " +
-        latestFinishedAudit.projectName
+      latestFinishedAudit.captain +
+      " " +
+      latestFinishedAudit.projectName
     );
-    $("#latestProject").text("Latest Project: " + latestFinishedProject);
+    $("#latestProject").text( latestFinishedProject);
 
     const auditData = await getAuditData(userId);
     createBarChart(auditData);
@@ -152,15 +151,17 @@ async function displaytitleData() {
 async function displayXpData(userId) {
   const xpData = await getXpForProjects(userId);
   // Sort xpData by amount in descending order
-  const sortedXpData = xpData.sort((a, b) => b.amount - a.amount).slice(0, 14); //you can specidy how much of it you need
+  const sortedXpData = xpData.sort((a, b) => b.amount - a.amount).slice(0, 5); //you can specidy how much of it you need
   // Create a formatted string for each project
   const xpDetails = sortedXpData
     .map((xp) => `${xp.name}: ${xp.amount} XP`)
     .join("\n");
   // Display total XP and detailed XP in the UI
-  $("#xpDetails").text(xpDetails);
-
-  createPieChart(sortedXpData);
+  const items = xpDetails.split('\n').slice(0, 5);
+  const listItems = items.map((item, index) => `<li>${item}</li>`).join('');
+  const orderedList = `<ul>${listItems}</ul>`;
+  $("#xpDetails").html(orderedList);
+  createPieChart(xpData.sort((a, b) => b.amount - a.amount).slice(0, 14));
 }
 
 
@@ -227,107 +228,107 @@ function createBarChart(data) {
 }
 
 function createPieChart(data) {
-  const width = 960,
-      height = 450,
-      radius = Math.min(width, height) / 2;
+  const width = 450,
+    height = 450,
+    radius = Math.min(width, height) / 2;
 
-  const svg = d3.select("body")
-      .append("svg")
-      .attr("width", width)
-      .attr("height", height)
-      .append("g")
-      .attr("transform", `translate(${width / 2}, ${height / 2})`);
+  const svg = d3.select("#xpChart")
+    .append("svg")
+    .attr("width", width)
+    .attr("height", height)
+    .append("g")
+    .attr("transform", `translate(${width / 2}, ${height / 2})`);
 
   svg.append("g").attr("class", "slices");
   svg.append("g").attr("class", "labels");
 
   const pie = d3.pie()
-      .sort(null)
-      .value(d => d.amount);
+    .sort(null)
+    .value(d => d.amount);
 
   const arc = d3.arc()
-      .outerRadius(radius * 0.8)
-      .innerRadius(radius * 0.4);
+    .outerRadius(radius * 0.8)
+    .innerRadius(radius * 0.4);
 
   const arcHover = d3.arc()
-      .outerRadius(radius * 0.9)
-      .innerRadius(radius * 0.4);
+    .outerRadius(radius * 0.9)
+    .innerRadius(radius * 0.4);
 
   const outerArc = d3.arc()
-      .innerRadius(radius * 0.9)
-      .outerRadius(radius * 0.9);
+    .innerRadius(radius * 0.9)
+    .outerRadius(radius * 0.9);
 
   const color = d3.scaleOrdinal(d3.schemeCategory10)
-      .domain(data.map(d => d.name));
+    .domain(data.map(d => d.name));
 
   const tooltip = d3.select("body").append("div")
-      .attr("class", "tooltip");
+    .attr("class", "tooltip");
 
   function change(data) {
-      const pieData = pie(data);
+    const pieData = pie(data);
 
-      const slice = svg.select(".slices").selectAll("path.slice")
-          .data(pieData, d => d.data.name);
+    const slice = svg.select(".slices").selectAll("path.slice")
+      .data(pieData, d => d.data.name);
 
-      slice.enter()
-          .append("path")
-          .attr("class", "slice")
-          .style("fill", d => color(d.data.name))
-          .on("mouseover", function (event, d) {
-              d3.select(this).transition().duration(200).attr("d", arcHover);
-              tooltip.transition().duration(200).style("opacity", .9);
-              tooltip.html(`${d.data.name}: ${d.data.amount} XP`)
-                  .style("left", (event.pageX + 5) + "px")
-                  .style("top", (event.pageY - 28) + "px");
-          })
-          .on("mouseout", function (d) {
-              d3.select(this).transition().duration(200).attr("d", arc);
-              tooltip.transition().duration(500).style("opacity", 0);
-          })
-          .merge(slice)
-          .transition().duration(1000)
-          .attrTween("d", function (d) {
-              this._current = this._current || d;
-              const interpolate = d3.interpolate(this._current, d);
-              this._current = interpolate(0);
-              return t => arc(interpolate(t));
-          });
+    slice.enter()
+      .append("path")
+      .attr("class", "slice")
+      .style("fill", d => color(d.data.name))
+      .on("mouseover", function (event, d) {
+        d3.select(this).transition().duration(200).attr("d", arcHover);
+        tooltip.transition().duration(200).style("opacity", .9);
+        tooltip.html(`${d.data.name}: ${d.data.amount} XP`)
+          .style("left", (event.pageX + 5) + "px")
+          .style("top", (event.pageY - 28) + "px");
+      })
+      .on("mouseout", function (d) {
+        d3.select(this).transition().duration(200).attr("d", arc);
+        tooltip.transition().duration(500).style("opacity", 0);
+      })
+      .merge(slice)
+      .transition().duration(1000)
+      .attrTween("d", function (d) {
+        this._current = this._current || d;
+        const interpolate = d3.interpolate(this._current, d);
+        this._current = interpolate(0);
+        return t => arc(interpolate(t));
+      });
 
-      slice.exit().remove();
+    slice.exit().remove();
 
-      const text = svg.select(".labels").selectAll("text")
-          .data(pieData, d => d.data.name);
+    const text = svg.select(".labels").selectAll("text")
+      .data(pieData, d => d.data.name);
 
-      text.enter().append("text")
-          .attr("dy", ".35em")
-          .merge(text)
-          .transition().duration(1000)
-          .attrTween("transform", function (d) {
-              this._current = this._current || d;
-              const interpolate = d3.interpolate(this._current, d);
-              this._current = interpolate(0);
-              return t => {
-                  const d2 = interpolate(t);
-                  const pos = outerArc.centroid(d2);
-                  pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
-                  return `translate(${pos})`;
-              };
-          })
-          .styleTween("text-anchor", function (d) {
-              this._current = this._current || d;
-              const interpolate = d3.interpolate(this._current, d);
-              this._current = interpolate(0);
-              return t => {
-                  const d2 = interpolate(t);
-                  return midAngle(d2) < Math.PI ? "start" : "end";
-              };
-          });
+    text.enter().append("text")
+      .attr("dy", ".35em")
+      .merge(text)
+      .transition().duration(1000)
+      .attrTween("transform", function (d) {
+        this._current = this._current || d;
+        const interpolate = d3.interpolate(this._current, d);
+        this._current = interpolate(0);
+        return t => {
+          const d2 = interpolate(t);
+          const pos = outerArc.centroid(d2);
+          pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+          return `translate(${pos})`;
+        };
+      })
+      .styleTween("text-anchor", function (d) {
+        this._current = this._current || d;
+        const interpolate = d3.interpolate(this._current, d);
+        this._current = interpolate(0);
+        return t => {
+          const d2 = interpolate(t);
+          return midAngle(d2) < Math.PI ? "start" : "end";
+        };
+      });
 
-      text.exit().remove();
+    text.exit().remove();
   }
 
   function midAngle(d) {
-      return d.startAngle + (d.endAngle - d.startAngle) / 2;
+    return d.startAngle + (d.endAngle - d.startAngle) / 2;
   }
 
   change(data);
