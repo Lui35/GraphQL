@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Login Page</title>
+  <title>Dashboard</title>
   <link rel="stylesheet" type="text/css" href="style.css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
     integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" />
@@ -12,7 +12,6 @@
   <script src="https://d3js.org/d3.v7.min.js"></script>
   <script type="module" src="profilePage.js"></script>
   <script type="module" src="query.js"></script>
-  <title>Document</title>
 </head>
 
 <header class="container-fluid bg-dark text-white py-3">
@@ -33,20 +32,36 @@
 </header>
 
 <body>
-  <div class="container">
+  <div class="container mt-4">
     <div class="row">
-      <div class="col-md-6">
-        <div class="card">
+      <!-- Left column -->
+      <div class="col-md-6 col-sm-12">
+        <div class="card mb-3">
           <div class="card-body">
             <h5 class="card-title">My Audits</h5>
             <div id="AuditChart" class="p-2">
-              <h1 id="auditRatio">Audit ratio : 1.08</h1>
+              <h3 id="auditRatio"></h3>
+              <div class="audit-progress-container">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Last Five Projects Text Card -->
+        <div class="card mb-3">
+          <div class="card-body">
+            <h3 class="card-title">Your last few projects:</h3>
+            <div id="auditList">
+              <div id="xpDetails"></div>
             </div>
           </div>
         </div>
       </div>
-      <div class="col-md-6">
-        <div class="card">
+
+      <!-- Right column -->
+      <div class="col-md-6 col-sm-12">
+        <!-- My Project Card -->
+        <div class="card mb-3">
           <div class="card-body">
             <h3 class="card-title">My Project</h3>
             <span class="details">Your latest Audit: </span>
@@ -56,28 +71,19 @@
             <a id="latestProject"></a>
           </div>
         </div>
+
+        <!-- Last Five Projects Chart Card -->
         <div class="card">
           <div class="card-body">
-            <h3 class="card-title">Your last five projects:</h3>
-            <div id="auditList">
-              <div id="xpDetails"></div>
-            </div>
-          </div>
-        </div>
-        <div class="card">
-          <div class="card-body">
-            <h3 class="card-title">Your last five projects:</h3>
+            <h3 class="card-title">Projects Chart:</h3>
             <div id="xpChart" class="p-2">
+              <!-- D3 Chart will be rendered here -->
             </div>
           </div>
         </div>
       </div>
     </div>
-
-
-
   </div>
-
 </body>
 
 </html>

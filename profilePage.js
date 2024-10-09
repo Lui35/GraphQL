@@ -151,13 +151,13 @@ async function displaytitleData() {
 async function displayXpData(userId) {
   const xpData = await getXpForProjects(userId);
   // Sort xpData by amount in descending order
-  const sortedXpData = xpData.sort((a, b) => b.amount - a.amount).slice(0, 5); //you can specidy how much of it you need
+  const sortedXpData = xpData.sort((a, b) => b.amount - a.amount).slice(0, 15); //you can specidy how much of it you need
   // Create a formatted string for each project
   const xpDetails = sortedXpData
     .map((xp) => `${xp.name}: ${xp.amount} XP`)
     .join("\n");
   // Display total XP and detailed XP in the UI
-  const items = xpDetails.split('\n').slice(0, 5);
+  const items = xpDetails.split('\n').slice(0, 15);
   const listItems = items.map((item, index) => `<li>${item}</li>`).join('');
   const orderedList = `<ul>${listItems}</ul>`;
   $("#xpDetails").html(orderedList);
@@ -168,13 +168,16 @@ async function displayXpData(userId) {
 
 function createBarChart(data) {
   const { auditRatio, totalDown, totalUp } = data;
+  
   // Prepare the data
   const chartData = [
-    { label: "Received", value: totalDown },
-    { label: "Done", value: totalUp },
+    { label: "Received", value: totalDown, color: "#4CAF50" }, // Green for Received
+    { label: "Done", value: totalUp, color: "#5bc0de" }        // Blue for Done
   ];
+
   $("#auditRatio").text("Audit ratio : " + parseFloat(auditRatio.toFixed(2)));
-  const width = 600;
+  
+  const width = 500;
   const height = 100;
   const margin = { top: 20, right: 30, bottom: 20, left: 100 };
 
@@ -184,16 +187,13 @@ function createBarChart(data) {
     .append("svg")
     .attr("width", width)
     .attr("height", height)
-    .style("background-color", "white"); // Match the background color from the example
-  //.style("display", "block")
-  //.style("margin", "auto");
 
   // Set the scales
   const y = d3
     .scaleBand()
     .domain(chartData.map((d) => d.label))
     .range([margin.top, height - margin.bottom])
-    .padding(0.3); // Adjust padding to match the style
+    .padding(0.3);
 
   const x = d3
     .scaleLinear()
@@ -212,20 +212,38 @@ function createBarChart(data) {
     .attr("y", (d) => y(d.label))
     .attr("width", (d) => x(d.value) - margin.left)
     .attr("height", y.bandwidth())
-    .attr("fill", "#black"); // Match the bar color from the example
+    .attr("fill", (d) => d.color)
+    .attr("rx", 10); // Rounded corners
 
-  // Add the y-axis
+  // Add the y-axis (labels)
   svg
     .append("g")
     .attr("transform", `translate(${margin.left},0)`)
-    .call(d3.axisLeft(y).tickSize(0)) // Remove tick marks
+    .call(d3.axisLeft(y).tickSize(0))
     .selectAll("text")
-    .style("fill", "#black") // Match the label color from the example
+    .style("fill", "#333") // Dark color for labels
     .style("font-size", "16px")
     .style("font-weight", "bold");
-  // Style the axis lines and ticks
-  svg.selectAll(".domain, .tick line").style("stroke", "#black");
+
+  // Remove axis lines and ticks
+  svg.selectAll(".domain, .tick line").style("stroke", "none");
+
+  // Optional: Add the value labels inside the bars
+  svg
+    .selectAll(".label")
+    .data(chartData)
+    .enter()
+    .append("text")
+    .attr("class", "label")
+    .attr("x", (d) => x(d.value) - 10) // Adjust the position
+    .attr("y", (d) => y(d.label) + y.bandwidth() / 2 + 5)
+    .attr("text-anchor", "end")
+    .text((d) => d.value)
+    .style("fill", "#fff") // White text inside the bars
+    .style("font-size", "14px")
+    .style("font-weight", "bold");
 }
+
 
 function createPieChart(data) {
   const width = 450,

@@ -1,44 +1,6 @@
-.login-page {
-  width: 360px;
-  padding: 8% 0 0;
-  margin: auto;
-}
-.form {
-  position: relative;
-  background: #ffffff;
-  max-width: 360px;
-  margin: 0 auto 100px;
-  padding: 45px;
-  text-align: center;
-}
-.form input {
-  font-family: "Roboto", sans-serif;
-  outline: 0;
-  background: #f2f2f2;
-  width: 100%;
-  border: 0;
-  margin: 0 0 15px;
-  padding: 15px;
-  box-sizing: border-box;
-  font-size: 14px;
-}
-.form button {
-  font-family: "Roboto", sans-serif;
-  outline: 0;
-  background: #808080;
-  width: 100%;
-  border: 0;
-  padding: 15px;
-  color: #ffffff;
-  font-size: 14px;
-}
-
-.form button:hover {
-  background: rgb(54, 54, 54);
-}
-
 body {
-  background: #808080;
+  background: #f8f9fa; /* Light grey background */
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
 }
 
 .header-container {
@@ -46,32 +8,78 @@ body {
   justify-content: space-between;
   align-items: center;
 }
+
 .text-container {
   display: inline-block;
 }
-.text-container h1,
-.text-container p {
+
+.text-container h1, .text-container p {
   display: inline;
   margin: 0;
   vertical-align: baseline;
 }
 
-
 .text-container p {
-  font-size: .9em; /* Adjust the font size to your liking */
-/* Adjust space between the h1 and p */
+  font-size: .9em;
   font-style: italic;
   font-family: 'Roboto Condensed', sans-serif;
 }
 
-body {
-  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-  position: relative;
+.container {
+  margin-top: 20px;
 }
 
-svg {
-  width: 450;
+.card {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: none;
+  min-width: 500px !important;
+}
+
+.card-title {
+  font-weight: bold;
+}
+
+.details {
+  font-weight: bold;
+}
+
+#xpChart, #AuditChart {
+  width: 100%;
+}
+
+#AuditChart {
+  height: 150px; /* Adjusted height for better display */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+#AuditChart h3 {
+  font-size: 2rem; /* Increase audit ratio size */
+  margin-bottom: 10px;
+}
+
+.audit-progress-container {
+  width: 100%;
+}
+
+.progress {
+  height: 20px;
+  background-color: #e9ecef;
+  border-radius: 5px;
+  overflow: hidden;
+  margin-bottom: 10px;
+}
+
+.progress-bar {
   height: 100%;
+}
+
+.progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
 }
 
 path.slice {
@@ -94,30 +102,5 @@ polyline {
   border-radius: 8px;
   pointer-events: none;
   opacity: 0;
-}
-
-#xpChart{
-  width: 450px;
-  height: 450px;
-}
-
-#AuditChart{
-  width: 450px;
-  height: 100px;
-}
-
-.flexcontainer {
-  display: flex;
-  flex-direction: row; /* row (default) or column */
-}
-
-.details{
-  font-weight: bold;
-}
-
-.container {
-  display: flex;
-  justify-content: center; /* Aligns items horizontally */
-  align-items: center; /* Aligns items vertically */
 }
 
