@@ -7,6 +7,7 @@ function delay(milliseconds) {
 
 // Function to handle login button click
 window.handleLogin = function () {
+  debugger
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
   const btn = document.getElementById("login");
